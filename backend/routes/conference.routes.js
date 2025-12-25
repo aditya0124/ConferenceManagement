@@ -33,10 +33,10 @@ router.get("/", authMiddleware, async (req, res) => {
   res.json(enriched);
 });
 
+// for admin cick view in admin panel , there i need it 
 router.get(
   "/:id/registrations",
   authMiddleware,
-  adminMiddleware,
   async (req, res) => {
     const bookings = await Booking.find({
       conferenceId: req.params.id
@@ -50,11 +50,27 @@ router.get(
 router.delete(
   "/:id",
   authMiddleware,
-  adminMiddleware,
   async (req, res) => {
     await Conference.findByIdAndDelete(req.params.id);
     res.json({ message: "Conference deleted" });
   }
 );
+
+
+
+// PUBLIC: Get feedback for a conference (for all logged-in users)
+router.get(
+  "/:id/feedback",
+  authMiddleware,
+  async (req, res) => {
+    const feedbacks = await Booking.find({
+      conferenceId: req.params.id,
+      feedback: { $ne: "" }
+    }).populate("userId", "name");
+
+    res.json(feedbacks);
+  }
+);
+
 
 export default router;
